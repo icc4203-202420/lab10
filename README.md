@@ -269,6 +269,37 @@ ActiveRecord::Base.connection.execute(query)
 
 **Validación de entrada:** Siempre validar y limpiar los datos que provienen del usuario para asegurar que solo contengan lo que se espera.
 
+## Bonus track: Ataque de cracking de contraseñas
+
+### Explotación
+
+Si las contraseñas de los usuarios están almacenadas en formato hasheado en la base de datos, aún existe la posibilidad de que, si los atacantes logran robarlas, puedan recuperarlas en texto plano mediante varios tipos de ataques, como fuerza bruta, ataques de diccionario o ataques con tablas arcoiris.
+
+En esta aplicación, las contraseñas de los usuarios están protegidas de manera extremadamente vulnerable, ya que se utiliza el algoritmo MD5, que es considerado inseguro debido a sus múltiples debilidades. A continuación se muestra el código que implementa este hash inseguro:
+
+```ruby
+# Hash inseguro usando MD5 para las contraseñas
+def password=(new_password)
+  self[:password] = Digest::MD5.hexdigest(new_password)
+end
+```
+
+Puedes encontrar las contraseñas de los usuarios hasheadas en el archivo `test/fixtures/files/passwords.txt`. Puedes luego dirigirte a [https://crackstation.net/](https://crackstation.net/) e ingresar estas contraseñas allí para recuperarlas en texto plano. Verás que dos de las tres contraseñas son altamente inseguras.
+
+### Mitigación
+
+La protección adecuada de contraseñas es fundamental para evitar que los atacantes puedan recuperarlas en texto plano mediante técnicas como ataques de diccionario, fuerza bruta o tablas arcoiris. A continuación, se presentan algunas medidas clave para mitigar estos riesgos:
+
+**Uso de Algoritmos de Hashing Seguros:** El primer paso para proteger las contraseñas es utilizar algoritmos de hashing diseñados específicamente para este propósito, que sean resistentes a ataques de cracking. Algoritmos como bcrypt, Argon2 o PBKDF2 están optimizados para dificultar los ataques mediante el aumento del costo computacional asociado a generar un hash. Estos algoritmos son mucho más seguros que opciones obsoletas como MD5 o SHA1, ya que están diseñados para ser "lentos" y requieren una mayor cantidad de recursos para calcular, lo que hace que el cracking sea menos eficiente.
+
+**Uso de Salting:** El salting es una técnica que añade un valor aleatorio (la "sal") a cada contraseña antes de aplicar el hash. Esto garantiza que incluso si dos usuarios tienen la misma contraseña, los hashes resultantes serán diferentes. El uso de sal previene ataques con tablas arcoiris, que dependen de precomputar hashes para un gran número de contraseñas comunes. El sal debe ser único para cada usuario y almacenarse junto con el hash de la contraseña.
+
+**Uso de Bibliotecas Seguras:** Reinventar soluciones de autenticación es arriesgado, ya que es fácil cometer errores que comprometan la seguridad. En lugar de implementar soluciones caseras, es recomendable utilizar bibliotecas que ya gestionen estas tareas de forma segura. En el ecosistema de Rails, Devise es una opción popular y robusta que maneja la autenticación, hashing de contraseñas con algoritmos seguros y salting de manera automática. Al usar Devise, se reduce significativamente el riesgo de vulnerabilidades en la implementación.
+
+**Aplicación de Políticas de Contraseñas Fuertes:** Además de las medidas técnicas, es importante imponer políticas que requieran contraseñas fuertes por parte de los usuarios. Las contraseñas deben tener una longitud mínima (al menos 8 caracteres), incluir una combinación de letras, números y caracteres especiales, y evitar el uso de contraseñas comunes. Esto reduce la efectividad de los ataques de diccionario y fuerza bruta.
+
+**Uso de Mecanismos Adicionales de Seguridad:** Es recomendable implementar capas adicionales de seguridad como (i) Autenticación multifactor (MFA), que requiere más de una prueba de autenticación (por ejemplo, una contraseña y un código enviado al teléfono); (ii) Rotación periódica de contraseñas en sistemas críticos; (iii) Monitoreo de actividad sospechosa en cuentas de usuario como múltiples intentos fallidos de inicio de sesión.
+
 ## Créditos
 
 Este laboratorio está basado en el proyecto original desarrollado por [Eileen M. Uchiltelle](https://github.com/eileencodes), quien parte del equipo core de Rails y del equipo de infraestructura de Shopify. El repositorio con el proyecto original está en https://github.com/eileencodes/security_examples.
