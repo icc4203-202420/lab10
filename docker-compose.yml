@@ -1,0 +1,17 @@
+version: '3'
+services:
+  app:
+    image: rails-vuln-demos  # Tu imagen construida de Rails
+    build:
+      context: .
+    command: bash -c "bundle install && bundle exec rails db:setup && rails s -b 0.0.0.0 -p 3000"
+    volumes:
+      - .:/app  # Mapea los archivos locales de la aplicación al contenedor
+      - gem_cache:/usr/local/bundle # Caché de gems
+      - ./db:/app/db # Mapea el directorio de la base de datos local
+    ports:
+      - "3000:3000"
+
+volumes:
+  gem_cache:
+  pgdata:

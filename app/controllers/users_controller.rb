@@ -63,6 +63,23 @@ class UsersController < ApplicationController
     end
   end
 
+  def new_search
+    # Solo renderiza la vista con el formulario
+  end
+
+  def search
+    name = params[:name]
+
+    # Construcción de una consulta SQL vulnerable
+    query = "SELECT name, email, website FROM users WHERE name LIKE '%#{name}%'"
+
+    # Ejecución de la consulta SQL
+    @users = ActiveRecord::Base.connection.execute(query)
+
+    # Renderizar la vista con la tabla de resultados
+    render 'search_results'
+  end  
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_user

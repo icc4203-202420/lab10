@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', github: 'rails/rails'
+gem 'rails', '~> 5.2.8'  # Última versión estable de Rails 5.x
 gem 'actionpack-xml_parser', github: 'rails/actionpack-xml_parser'
 
 # Use sqlite3 as the database for Active Record
@@ -40,7 +40,7 @@ end
 
 group :development do
   # Access an IRB console on exception pages or by using <%= console %> in views
-  gem 'web-console', github: 'rails/web-console'
+  gem 'web-console', '~> 3.7.0'
   gem 'listen', '~> 3.0.5'
 end
 
